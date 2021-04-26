@@ -9,11 +9,15 @@ namespace KonzolovaHra
     class Player : Rival
     {
         public int Points;
+        public List<int> PointList;
         public int Life;
-        public Player(int x, int y, string look, int formerX, int points, int life) : base(x, y, look, formerX)
+        public string Name;
+        public Player(int x, int y, string look, int formerX, int points, int life, string name, List<int> pointList) : base(x, y, look, formerX)
         {
             Points = points;
             Life = life;
+            Name = name;
+            PointList = pointList;
         }
         public void MovePlayer(int number)
         {
