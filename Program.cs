@@ -11,7 +11,14 @@ namespace KonzolovaHra
 {
     class Program
     {
-        static Timer consoleTimer = null;        
+        static Timer consoleTimer = null;
+        static Timer enemyShooting = null;
+        static Timer enemyMove = null;
+        static Player player = null;
+        static List<Bullet> playerBulletList = null;
+        static List<Bullet> enemyBulletList = null;
+        //static List<Bullet> playerBulletList = new List<Bullet>();
+        //static List<Bullet> enemyBulletList = new List<Bullet>();
         static void Main(string[] args)
         {
             Console.WindowWidth = 70;
@@ -26,7 +33,7 @@ namespace KonzolovaHra
             //string pathToFile = "";
             //string pathToDatabase = "";
 
-            string fileName = "playerList.json";
+            //string fileName = "playerList.json";
 
             JsonSerializerSettings settings = new JsonSerializerSettings();
             settings.TypeNameHandling = TypeNameHandling.All;
@@ -36,64 +43,84 @@ namespace KonzolovaHra
             //string pathToDatabase = Path.Combine(pathToFile, fileName);
 
             //if (!Directory.Exists(Path.Combine(@"C:\ProgramData", "playerList.txt")))
-            if (!File.Exists("playerList.json"))
+            loadPlayerFromFile();
+            Play();
+
+
+            void loadPlayerFromFile()
             {
-                playerList.Add(1, new Player(width / 2, height - 1, "☺", 0, 0, 1, "Adam", new List<int>()));
-                playerList.Add(2, new Player(width / 2, height - 1, "☺", 0, 0, 1, "Bedřich", new List<int>()));
-                playerList.Add(3, new Player(width / 2, height - 1, "☺", 0, 0, 1, "Cecílie", new List<int>()));
-
-            }
-            else
-            {
-                string playerListRead = File.ReadAllText("playerList.json");
-                playerList = JsonConvert.DeserializeObject<Dictionary<int, Player>>(playerListRead, settings);
-            }               
-            
-            //Player player = playerList[1];
-            Player player = new Player(width / 2, height - 1, "☺", 0, 0, 1, "pokus", new List<int>());
-
-            List<Bullet> playerBulletList = new List<Bullet>();
-            List<Bullet> enemyBulletList = new List<Bullet>();
-
-            TimeSpan threadSleepTimeSpan = TimeSpan.FromMilliseconds(301);
-
-            Console.CursorVisible = false;
-            Console.Clear();
-
-            var autoEvent = new AutoResetEvent(false); //???
-           
-            Console.WriteLine("Vítejte ve hře. \n Nejdříve si vyberte, s jakým hráčem budete hrát. \n Hráče si můžete buď nově vytvořit, nebo si ho vybrat z existujícího seznamu. \n \n \"Chci si vytvořit nového hráče\" - stiskněte 1 \n \"Chci si vybrat hráče ze seznamu\" - stiskněte 2");
-            ChoosePlayer();
-           
-            consoleTimer = new Timer(ConsoleRender, autoEvent, 1000, 300);
-            var consoleClearTimer = new Timer(ClearConsole, autoEvent, 1000, 2000);
-            var enemyShooting = new Timer(EnemyIsShooting, autoEvent, 5000, 8000);
-            var enemyMove = new Timer(enemy.MoveEnemy, autoEvent, 1000, 1000);
-
-            while (true)
-            {
-                if (Console.KeyAvailable)   //neceka, az neco zmacknu
+                if (!File.Exists("playerList.json"))
                 {
-                    switch (Console.ReadKey(true).Key)
+                    //ZIVOTY POTE UPRAVIT
+                    playerList.Add(1, new Player(width / 2, height - 1, "☺", 0, 0, 2, "Adam", new List<int>()));
+                    playerList.Add(2, new Player(width / 2, height - 1, "☺", 0, 0, 2, "Bedřich", new List<int>()));
+                    playerList.Add(3, new Player(width / 2, height - 1, "☺", 0, 0, 2, "Cecílie", new List<int>()));
+
+                }
+                else
+                {
+                    string playerListRead = File.ReadAllText("playerList.json");
+                    playerList = JsonConvert.DeserializeObject<Dictionary<int, Player>>(playerListRead, settings);
+                    foreach (var item in playerList)
                     {
-                        case ConsoleKey.RightArrow:                                                    
-                            player.MovePlayer(1);
-                            break;
-                        case ConsoleKey.LeftArrow:                            
-                            player.MovePlayer(-1);
-                            break;
-                        case ConsoleKey.UpArrow:                            
-                            playerBulletList.Add(new PlayerBullet(player.X, player.Y - 1, "|", 0, true));
-                            break;
+                        item.Value.X = width / 2;
+                        item.Value.Y = height - 1;
+                        item.Value.Points = 0;
+                        item.Value.Life = 2;     ///TOHLE POTOM UPRAVT
                     }
                 }
+            }
+            
+            void Play()
+            {
+                //Player player = playerList[1];
+                //Player player = new Player(width / 2, height - 1, "☺", 0, 0, 1, "pokus", new List<int>());
 
-                while (Console.KeyAvailable)    //zajisti, ze pro jedno zmacknuti to udela jednu akci, pohyb se "nezasekava"
+                //List<Bullet> playerBulletList = new List<Bullet>();
+                playerBulletList = new List<Bullet>();
+                //List<Bullet> enemyBulletList = new List<Bullet>();
+                enemyBulletList = new List<Bullet>();
+
+                TimeSpan threadSleepTimeSpan = TimeSpan.FromMilliseconds(301);
+
+                Console.CursorVisible = false;
+                Console.Clear();
+
+                var autoEvent = new AutoResetEvent(false); //???
+
+                Console.WriteLine("Vítejte ve hře. \n Nejdříve si vyberte, s jakým hráčem budete hrát. \n Hráče si můžete buď nově vytvořit, nebo si ho vybrat z existujícího seznamu. \n \n \"Chci si vytvořit nového hráče\" - stiskněte 1 \n \"Chci si vybrat hráče ze seznamu\" - stiskněte 2");
+                ChoosePlayer();
+
+                consoleTimer = new Timer(ConsoleRender, autoEvent, 1000, 300);
+                var consoleClearTimer = new Timer(ClearConsole, autoEvent, 1000, 2000);
+                enemyShooting = new Timer(EnemyIsShooting, autoEvent, 5000, 8000);
+                enemyMove = new Timer(enemy.MoveEnemy, autoEvent, 1000, 1000);
+
+                while (true)
                 {
-                    Console.ReadKey(true);
-                }
+                    if (Console.KeyAvailable)   //neceka, az neco zmacknu
+                    {
+                        switch (Console.ReadKey(true).Key)
+                        {
+                            case ConsoleKey.RightArrow:
+                                player.MovePlayer(1);
+                                break;
+                            case ConsoleKey.LeftArrow:
+                                player.MovePlayer(-1);
+                                break;
+                            case ConsoleKey.UpArrow:
+                                playerBulletList.Add(new PlayerBullet(player.X, player.Y - 1, "|", 0, true));
+                                break;
+                        }
+                    }
 
-                Thread.Sleep(threadSleepTimeSpan);   //uspani while, aby byl pohyb plynuly
+                    while (Console.KeyAvailable)    //zajisti, ze pro jedno zmacknuti to udela jednu akci, pohyb se "nezasekava"
+                    {
+                        Console.ReadKey(true);
+                    }
+
+                    Thread.Sleep(threadSleepTimeSpan);   //uspani while, aby byl pohyb plynuly
+                }
             }
 
 
@@ -104,12 +131,11 @@ namespace KonzolovaHra
                 if (player.Life == 0)
                 {
                     consoleTimer.Change(Timeout.Infinite, Timeout.Infinite);
+                    enemyShooting.Change(Timeout.Infinite, Timeout.Infinite);
+                    enemyMove.Change(Timeout.Infinite, Timeout.Infinite);
                     int actualScore = player.Points;
                     SaveTheResults();
-                    RenderFinalActualScore(actualScore);
-
-                    
-                    
+                    EndOfGame(actualScore);                                        
                 }
                 else
                 {
@@ -140,33 +166,75 @@ namespace KonzolovaHra
             }
 
             void ClearConsole(Object stateInfo)
-            {
-                 //toto ti maze obrazovku - slo by udelat aby nedelalo kdyz clovek dohral, ale to by se musela vynulovavat hra az na zacatku dalsi
+            {                 
                  if (player.Life > 0) Console.Clear();
             }
 
             void SaveTheResults()
             {
-                player.PointList.Add(player.Points);  //adding points to player PointList
-                //vymazaval bych to az pri startu dalsi hry
-                player.Life = 1;
-                player.Points = 0;
-                player.X = width / 2;
-                player.Y = height - 1;
+                player.PointList.Add(player.Points);  //adding points to player PointList                
 
+                //saving into file
                 string playerListWrite = JsonConvert.SerializeObject(playerList, settings);
                 File.WriteAllText("playerList.json", playerListWrite);
             }
 
-            void RenderFinalActualScore(int score)
+            void EndOfGame(int score)
             {
-                Console.SetCursorPosition((width - 29) / 2, height / 2);
-                Console.WriteLine("Konec hry! Vaše skóre: " + score + " bodů"); //30
+                string finalPhrase = "Konec hry! Vaše skóre: " + score + " bodů";
+                string question = "Co chcete udělat teď?";
+                string choice1 = "Dát si další hru: stiskněte 1";
+                string choice2 = "Ukončit hru: stiskněte 2";
+                string choice3 = "Prohledat seznam hráčů: stiskněte 3";
+                Console.SetCursorPosition((width - finalPhrase.Length) / 2, height / 2);
+                Console.WriteLine(finalPhrase); //30
                                                                                 //jen pro kontrolu:
                                                                                 //Console.WriteLine();
                                                                                 //PlayerListRender();
+                Console.SetCursorPosition((width - question.Length) / 2, (height / 2) + 2);
+                Console.WriteLine(question);
+                Console.SetCursorPosition((width - choice1.Length) / 2, (height / 2) + 4);
+                Console.WriteLine(choice1);
+                Console.SetCursorPosition((width - choice2.Length) / 2, (height / 2) + 5);
+                Console.WriteLine(choice2);
+                Console.SetCursorPosition((width - choice3.Length) / 2, (height / 2) + 6);
+                Console.WriteLine(choice3);
+                Console.SetCursorPosition(width - 12, height);
+                Console.Write("Životy: " + player.Life);
 
-                Console.ReadLine();
+                bool choiceDone = false;
+
+                do
+                {
+                    string choice = Console.ReadLine();
+                    int number;
+                    bool isNumber = int.TryParse(choice, out number);
+
+                    if (!isNumber || (number != 1 && number != 2 && number != 3))
+                    {
+                        Console.WriteLine("Stiskněte 1, nebo 2, nebo 3.");
+                    }
+                    else
+                    {
+                        if (number == 1)
+                        {
+                            choiceDone = true;
+                            loadPlayerFromFile();
+                            Play();
+                        }
+                        if (number == 2)
+                        {
+                            
+                        }
+                        if (number == 3)
+                        {
+
+                        }
+
+                    }
+                } while (!choiceDone);
+
+               // Console.ReadLine();
             }
 
             void EnemyIsShooting(Object stateInfo)
@@ -200,7 +268,7 @@ namespace KonzolovaHra
                     if (bullet.X >= enemy.X && bullet.X <= enemy.X + 5 && bullet.Y == enemy.Y)
                     {
                         Console.SetCursorPosition(bullet.X, bullet.Y);
-                        Console.Write("####");
+                        Console.Write(">BANG<");
 
                         player.Points++;
                     }
