@@ -7,6 +7,7 @@ using System.IO;
 using System.Threading;
 using Newtonsoft.Json;
 
+
 namespace KonzolovaHra
 {
     class Program
@@ -52,9 +53,9 @@ namespace KonzolovaHra
                 if (!File.Exists("playerList.json"))
                 {
                     //ZIVOTY POTE UPRAVIT
-                    playerList.Add(1, new Player(width / 2, height - 1, "☺", 0, 0, 2, "Adam", new List<int>()));
-                    playerList.Add(2, new Player(width / 2, height - 1, "☺", 0, 0, 2, "Bedřich", new List<int>()));
-                    playerList.Add(3, new Player(width / 2, height - 1, "☺", 0, 0, 2, "Cecílie", new List<int>()));
+                    playerList.Add(1, new Player(width / 2, height - 1, "☺", 0, 0, 1, "Adam", new List<int>()));
+                    playerList.Add(2, new Player(width / 2, height - 1, "☺", 0, 0, 1, "Bedřich", new List<int>()));
+                    playerList.Add(3, new Player(width / 2, height - 1, "☺", 0, 0, 1, "Cecílie", new List<int>()));
 
                 }
                 else
@@ -66,7 +67,7 @@ namespace KonzolovaHra
                         item.Value.X = width / 2;
                         item.Value.Y = height - 1;
                         item.Value.Points = 0;
-                        item.Value.Life = 2;     ///TOHLE POTOM UPRAVT
+                        item.Value.Life = 1;     ///TOHLE POTOM UPRAVT
                     }
                 }
             }
@@ -185,7 +186,7 @@ namespace KonzolovaHra
                 string question = "Co chcete udělat teď?";
                 string choice1 = "Dát si další hru: stiskněte 1";
                 string choice2 = "Ukončit hru: stiskněte 2";
-                string choice3 = "Prohledat seznam hráčů: stiskněte 3";
+                string choice3 = "Zobrazit výsledky hráčů: stiskněte 3";
                 Console.SetCursorPosition((width - finalPhrase.Length) / 2, height / 2);
                 Console.WriteLine(finalPhrase); //30
                                                                                 //jen pro kontrolu:
@@ -216,21 +217,14 @@ namespace KonzolovaHra
                     }
                     else
                     {
+                        choiceDone = true;
                         if (number == 1)
-                        {
-                            choiceDone = true;
+                        {                            
                             loadPlayerFromFile();
                             Play();
                         }
-                        if (number == 2)
-                        {
-                            
-                        }
-                        if (number == 3)
-                        {
-
-                        }
-
+                        if (number == 2) Environment.Exit(0);                                                    
+                        if (number == 3) ExploreResults();
                     }
                 } while (!choiceDone);
 
@@ -381,6 +375,241 @@ namespace KonzolovaHra
                     else highestScore = item.Value.PointList.Max().ToString();
                     Console.WriteLine(item.Key + " " + item.Value.Name + " nejvyšší dosažené skóre: " + highestScore);
                 }
+            }
+
+            void ExploreResults()
+            {
+                Console.Clear();
+                Console.WriteLine("Pojďme prozkoumat výsledky hráčů.");
+                Console.WriteLine();
+                Console.WriteLine("Vypsat první tři hráče s nejvyšším skóre: stiskněte 1");
+                Console.WriteLine("Vyhledat konkrétního hráče dle jména: stiskněte 2");
+                Console.WriteLine("Vypsat všechny hráče podle abecedy: stiskněte 3");
+                Console.WriteLine("Vypsat všechny hráče podle nejvyššího počtu získaných bodů: stiskněte 4");
+
+                bool choiceDone = false;
+
+                do
+                {
+                    string choice = Console.ReadLine();
+                    int number;
+                    bool isNumber = int.TryParse(choice, out number);
+
+                    if (!isNumber || (number != 1 && number != 2 && number != 3 && number != 4))
+                    {
+                        Console.WriteLine("Stiskněte 1, nebo 2, nebo 3, nebo 4.");
+                    }
+                    else
+                    {
+                        choiceDone = true;
+                        if (number == 1) RenderBestThree();                        
+                             //if (playerList != null)?("Bohužel, seznam hráčů je prázdný nebo příliš krátký. Stiskněte 1, pokud chcete ukončit hru, nebo 2, pokud chcete hrát novou hru.");                                                    
+                        if (number == 2) RenderSpecificPlayer();                     
+                        if (number == 3) RenderAlphabetically();
+                        if (number == 4) RenderFromTheBest();
+                    }
+                } while (!choiceDone);
+
+                Console.ReadLine();
+
+            }
+
+            void RenderBestThree()
+            {
+                Console.Clear();
+                var bestthree = playerList.OrderByDescending(p => p.Value.PointList.Max()).Take(3).Select(p => p.Value);
+                Console.WriteLine("První tři nejlepší: ");
+                int order = 1;
+                foreach(var item in bestthree)
+                {
+                    Console.WriteLine($"{order}: {item.Name}, nejvyšší počet získaných bodů: {item.PointList.Max()}");
+                    order++;
+                }
+                Console.WriteLine();
+                Console.WriteLine("A co dál?");
+                Console.WriteLine("Pokračovat v prozkoumávání výsledků - stikněte 1");
+                Console.WriteLine("Ukončit hru - stiskněte 2");
+                Console.WriteLine("Začít novou hru - stiskněte 3");
+
+                bool choiceDone = false;
+
+                do
+                {
+                    string choice = Console.ReadLine();
+                    int number;
+                    bool isNumber = int.TryParse(choice, out number);
+
+                    if (!isNumber || (number != 1 && number != 2 && number != 3))
+                    {
+                        Console.WriteLine("Stiskněte 1, 2, nebo 3.");
+                    }
+                    else
+                    {
+                        choiceDone = true;
+                        if (number == 1) ExploreResults();
+                        //if (playerList != null)?("Bohužel, seznam hráčů je prázdný nebo příliš krátký. Stiskněte 1, pokud chcete ukončit hru, nebo 2, pokud chcete hrát novou hru.");                                                    
+                        if (number == 2) Environment.Exit(0);
+                        if (number == 3)
+                        {
+                            loadPlayerFromFile();
+                            Play();
+                        }
+                    }
+                } while (!choiceDone);
+                //Console.ReadLine();
+            }
+
+            void RenderSpecificPlayer()
+            {
+                Console.Clear();
+                Console.WriteLine("Zadejte jméno hráče, kterého hledáte:");
+                bool nameEntered = false;
+                do
+                {
+                    string name = Console.ReadLine();
+                    if (String.IsNullOrWhiteSpace(name)) Console.WriteLine("Tohle není jméno. Zadejte jméno s platnými znaky:");
+                    else
+                    {                        
+                        var chosenPlayer = playerList.Where(p => p.Value.Name == name).Select(p => p.Value).ToList();
+                        if (chosenPlayer.Count == 0) Console.WriteLine("Bohužel, toto jméno v seznamu hráčů neexistuje. Zadejte jiné jméno:");
+                        else
+                        {
+                            nameEntered = true;
+                            Console.WriteLine();
+                            foreach(var item in chosenPlayer)
+                            {
+                                Console.WriteLine($"Hráč \"{item.Name}\", nejvyšší počet získaných bodů: {item.PointList.Max()}");
+                            }                            
+                        } 
+                    }
+                } while (!nameEntered);
+
+                Console.WriteLine();
+                Console.WriteLine("A co dál?");
+                Console.WriteLine("Pokračovat v prozkoumávání výsledků - stikněte 1");
+                Console.WriteLine("Ukončit hru - stiskněte 2");
+                Console.WriteLine("Začít novou hru - stiskněte 3");
+
+                bool choiceDone = false;
+
+                do
+                {
+                    string choice = Console.ReadLine();
+                    int number;
+                    bool isNumber = int.TryParse(choice, out number);
+
+                    if (!isNumber || (number != 1 && number != 2 && number != 3))
+                    {
+                        Console.WriteLine("Stiskněte 1, 2, nebo 3.");
+                    }
+                    else
+                    {
+                        choiceDone = true;
+                        if (number == 1) ExploreResults();
+                        //if (playerList != null)?("Bohužel, seznam hráčů je prázdný nebo příliš krátký. Stiskněte 1, pokud chcete ukončit hru, nebo 2, pokud chcete hrát novou hru.");                                                    
+                        if (number == 2) Environment.Exit(0);
+                        if (number == 3)
+                        {
+                            loadPlayerFromFile();
+                            Play();
+                        }
+                    }
+                } while (!choiceDone);
+
+            }
+
+            void RenderAlphabetically()
+            {
+                Console.Clear();
+                var sortedAlphabetically = playerList.OrderBy(p => p.Value.Name).Select(p => p.Value);
+                Console.WriteLine("Seznam hráčů seřazených podle abecedy: ");
+                Console.WriteLine();
+                int order = 1;
+                foreach (var item in sortedAlphabetically)
+                {
+                    Console.WriteLine($"{order}: {item.Name}, nejvyšší počet získaných bodů: {item.PointList.Max()}");
+                    order++;
+                }
+
+                Console.WriteLine();
+                Console.WriteLine("A co dál?");
+                Console.WriteLine("Pokračovat v prozkoumávání výsledků - stikněte 1");
+                Console.WriteLine("Ukončit hru - stiskněte 2");
+                Console.WriteLine("Začít novou hru - stiskněte 3");
+
+                bool choiceDone = false;
+
+                do
+                {
+                    string choice = Console.ReadLine();
+                    int number;
+                    bool isNumber = int.TryParse(choice, out number);
+
+                    if (!isNumber || (number != 1 && number != 2 && number != 3))
+                    {
+                        Console.WriteLine("Stiskněte 1, 2, nebo 3.");
+                    }
+                    else
+                    {
+                        choiceDone = true;
+                        if (number == 1) ExploreResults();
+                        //if (playerList != null)?("Bohužel, seznam hráčů je prázdný nebo příliš krátký. Stiskněte 1, pokud chcete ukončit hru, nebo 2, pokud chcete hrát novou hru.");                                                    
+                        if (number == 2) Environment.Exit(0);
+                        if (number == 3)
+                        {
+                            loadPlayerFromFile();
+                            Play();
+                        }
+                    }
+                } while (!choiceDone);
+
+            }
+
+            void RenderFromTheBest()
+            {
+                Console.Clear();
+                var sortedByBest = playerList.OrderByDescending(p => p.Value.PointList.Max()).Select(p => p.Value);
+                Console.WriteLine("Seznam hráčů seřazených podle nejlepších výsledků: ");
+                Console.WriteLine();
+                int order = 1;
+                foreach (var item in sortedByBest)
+                {
+                    Console.WriteLine($"{order}: {item.Name}, nejvyšší počet získaných bodů: {item.PointList.Max()}");
+                    order++;
+                }
+
+                Console.WriteLine();
+                Console.WriteLine("A co dál?");
+                Console.WriteLine("Pokračovat v prozkoumávání výsledků - stikněte 1");
+                Console.WriteLine("Ukončit hru - stiskněte 2");
+                Console.WriteLine("Začít novou hru - stiskněte 3");
+
+                bool choiceDone = false;
+
+                do
+                {
+                    string choice = Console.ReadLine();
+                    int number;
+                    bool isNumber = int.TryParse(choice, out number);
+
+                    if (!isNumber || (number != 1 && number != 2 && number != 3))
+                    {
+                        Console.WriteLine("Stiskněte 1, 2, nebo 3.");
+                    }
+                    else
+                    {
+                        choiceDone = true;
+                        if (number == 1) ExploreResults();
+                        //if (playerList != null)?("Bohužel, seznam hráčů je prázdný nebo příliš krátký. Stiskněte 1, pokud chcete ukončit hru, nebo 2, pokud chcete hrát novou hru.");                                                    
+                        if (number == 2) Environment.Exit(0);
+                        if (number == 3)
+                        {
+                            loadPlayerFromFile();
+                            Play();
+                        }
+                    }
+                } while (!choiceDone);
+
             }
 
         }
