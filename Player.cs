@@ -12,12 +12,14 @@ namespace KonzolovaHra
         public List<int> PointList;
         public int Life;
         public string Name;
-        public Player(int x, int y, string look, int formerX, int points, int life, string name, List<int> pointList) : base(x, y, look, formerX)
+        public int NumberOfBullets;
+        public Player(int x, int y, string look, int formerX, int points, int life, string name, List<int> pointList, int numberOfBullets) : base(x, y, look, formerX)
         {
             Points = points;
             Life = life;
             Name = name;
             PointList = pointList;
+            NumberOfBullets = numberOfBullets;
         }
         public void MovePlayer(int number)
         {

@@ -53,9 +53,9 @@ namespace KonzolovaHra
                 if (!File.Exists("playerList.json"))
                 {
                     //ZIVOTY POTE UPRAVIT
-                    playerList.Add(1, new Player(width / 2, height - 1, "☺", 0, 0, 1, "Adam", new List<int>()));
-                    playerList.Add(2, new Player(width / 2, height - 1, "☺", 0, 0, 1, "Bedřich", new List<int>()));
-                    playerList.Add(3, new Player(width / 2, height - 1, "☺", 0, 0, 1, "Cecílie", new List<int>()));
+                    playerList.Add(1, new Player(width / 2, height - 1, "☺", 0, 0, 1, "Adam", new List<int>(), 40));
+                    playerList.Add(2, new Player(width / 2, height - 1, "☺", 0, 0, 1, "Bedřich", new List<int>(), 40));
+                    playerList.Add(3, new Player(width / 2, height - 1, "☺", 0, 0, 1, "Cecílie", new List<int>(), 40));
 
                 }
                 else
@@ -68,6 +68,7 @@ namespace KonzolovaHra
                         item.Value.Y = height - 1;
                         item.Value.Points = 0;
                         item.Value.Life = 1;     ///TOHLE POTOM UPRAVT
+                        item.Value.NumberOfBullets = 40;
                     }
                 }
             }
@@ -110,7 +111,9 @@ namespace KonzolovaHra
                                 player.MovePlayer(-1);
                                 break;
                             case ConsoleKey.UpArrow:
+                            case ConsoleKey.Spacebar:
                                 playerBulletList.Add(new PlayerBullet(player.X, player.Y - 1, "|", 0, true));
+                                player.NumberOfBullets--;
                                 break;
                         }
                     }
@@ -157,7 +160,7 @@ namespace KonzolovaHra
                         if (!nameAlreadyExists)
                         {
                             nameEntered = true;
-                            playerList.Add(playerList.Count + 1, new Player(width / 2, height - 1, "☺", 0, 0, 1, name, new List<int>()));
+                            playerList.Add(playerList.Count + 1, new Player(width / 2, height - 1, "☺", 0, 0, 1, name, new List<int>(), 40));
                             player = playerList[playerList.Count];
                             Console.WriteLine("Výborně, budete hrát jako \"" + player.Name + "\". Zmáčkněte Enter a hra může začít.");
                             Console.ReadLine();
@@ -190,8 +193,6 @@ namespace KonzolovaHra
                     int number;
                     bool isNumber = int.TryParse(playerChoice, out number);
 
-
-
                     if (!isNumber || (number < 1 || number > playerList.Count))
                     {
                         Console.WriteLine("Stiskněte platné číslo hráče:");
@@ -220,7 +221,7 @@ namespace KonzolovaHra
 
             void ConsoleRender(Object stateInfo)
             {
-                if (player.Life == 0)
+                if (player.Life == 0 || player.NumberOfBullets == 0)
                 {
                     consoleTimer.Change(Timeout.Infinite, Timeout.Infinite);
                     enemyShooting.Change(Timeout.Infinite, Timeout.Infinite);
@@ -259,7 +260,7 @@ namespace KonzolovaHra
 
             void ClearConsole(Object stateInfo)
             {
-                if (player.Life > 0) Console.Clear();
+                if (player.Life > 0 && player.NumberOfBullets > 0) Console.Clear();
             }
 
             void EnemyIsShooting(Object stateInfo)
@@ -324,7 +325,9 @@ namespace KonzolovaHra
 
             void EndOfGame(int score)
             {
-                string finalPhrase = "Konec hry! Vaše skóre: " + score + " bodů";
+                string finalPhrase = "";
+                if (player.Life == 0 ) finalPhrase = "Zranění neslučitelné s životem, konec hry! Vaše skóre: " + score + " bodů";
+                else if (player.NumberOfBullets == 0) finalPhrase = "Došly náboje, konec hry! Vaše skóre: " + score + " bodů";
                 string question = "Co chcete udělat teď?";
                 string choice1 = "Dát si další hru: stiskněte 1";
                 string choice2 = "Ukončit hru: stiskněte 2";
@@ -344,7 +347,7 @@ namespace KonzolovaHra
                 Console.WriteLine(choice3);
                 Console.SetCursorPosition(width - 12, height);
                 Console.Write("Životy: " + player.Life);
-                Console.SetCursorPosition(width / 2, (height / 2) + 7);
+                Console.SetCursorPosition(width / 2, (height / 2) + 7);              
 
                 ChoiceMaking choiceEndOfGame = new ChoiceMaking(new Dictionary<int, Action>() { {1, () => { loadPlayerFromFile(); Play(); } }, {2, () => Environment.Exit(0)}, {3, () => ExploreResults() } });
                 choiceEndOfGame.Choose();                
