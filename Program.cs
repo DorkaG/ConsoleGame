@@ -89,7 +89,7 @@ namespace KonzolovaHra
 
                 var autoEvent = new AutoResetEvent(false); //???
 
-                Console.WriteLine("Vítejte ve hře. \n Nejdříve si vyberte, s jakým hráčem budete hrát. \n Hráče si můžete buď nově vytvořit, nebo si ho vybrat z existujícího seznamu. \n \n \"Chci si vytvořit nového hráče\" - stiskněte 1 \n \"Chci si vybrat hráče ze seznamu\" - stiskněte 2");
+                Console.WriteLine("Vítejte ve hře. \n Nejdříve si vyberte, s jakým hráčem budete hrát. \n Hráče si můžete buď nově vytvořit, nebo si ho vybrat z existujícího seznamu. \n \n \"Chci si vytvořit nového hráče\" - stiskněte 1 \n \"Chci si vybrat již existujícího hráče\" - stiskněte 2");
                 ChoosePlayer();
 
                 consoleTimer = new Timer(ConsoleRender, autoEvent, 1000, 300);
@@ -136,24 +136,38 @@ namespace KonzolovaHra
             void EnterPlayerName()
             {
                 Console.WriteLine("Zadejte jméno nového hráče:");
-                bool nameEntered = false;
+                bool nameEntered = false;                
                 do
                 {
+                    bool nameAlreadyExists = false;
                     string name = Console.ReadLine();
-                    if (String.IsNullOrWhiteSpace(name)) Console.WriteLine("Tohle není jméno. Zadejte jméno s platnými znaky:");
+
+                    if (String.IsNullOrWhiteSpace(name)) Console.WriteLine("Tohle není jméno. Zadejte jméno s platnými znaky:");                    
                     else
                     {
-                        nameEntered = true;
-                        playerList.Add(playerList.Count + 1, new Player(width / 2, height - 1, "☺", 0, 0, 1, name, new List<int>()));
-                        player = playerList[playerList.Count];
-                        Console.WriteLine("Výborně, budete hrát jako \"" + player.Name + "\". Zmáčkněte Enter a hra může začít.");
-                        Console.ReadLine();
+                        foreach(var item in playerList)
+                        {
+                            if (item.Value.Name == name)
+                            {
+                                nameAlreadyExists = true;
+                                Console.WriteLine("Toto jméno už existuje. Zadejte jiné jméno:");
+                            }
+                        }
+
+                        if (!nameAlreadyExists)
+                        {
+                            nameEntered = true;
+                            playerList.Add(playerList.Count + 1, new Player(width / 2, height - 1, "☺", 0, 0, 1, name, new List<int>()));
+                            player = playerList[playerList.Count];
+                            Console.WriteLine("Výborně, budete hrát jako \"" + player.Name + "\". Zmáčkněte Enter a hra může začít.");
+                            Console.ReadLine();
+                        }                        
                     }
                 } while (!nameEntered);
             }
 
             void ChoosePlayerFromList()
-            {
+            {                
                 Console.WriteLine("Zde je seznam hráčů:");
                 PlayerListRender();
                 Console.WriteLine();
@@ -194,7 +208,8 @@ namespace KonzolovaHra
 
             void PlayerListRender()
             {
-                foreach (var item in playerList)
+                var playerListAlphabetically = playerList.OrderBy(p => p.Value.Name);
+                foreach (var item in playerListAlphabetically)
                 {
                     string highestScore = "";
                     if (item.Value.PointList.Count == 0) highestScore = "Ještě nehrál(a).";
@@ -246,6 +261,7 @@ namespace KonzolovaHra
             {
                 if (player.Life > 0) Console.Clear();
             }
+
             void EnemyIsShooting(Object stateInfo)
             {
                 enemyBulletList.Add(new EnemyBullet(enemy.X, 1, "O", 0, true));
@@ -328,6 +344,7 @@ namespace KonzolovaHra
                 Console.WriteLine(choice3);
                 Console.SetCursorPosition(width - 12, height);
                 Console.Write("Životy: " + player.Life);
+                Console.SetCursorPosition(width / 2, (height / 2) + 7);
 
                 ChoiceMaking choiceEndOfGame = new ChoiceMaking(new Dictionary<int, Action>() { {1, () => { loadPlayerFromFile(); Play(); } }, {2, () => Environment.Exit(0)}, {3, () => ExploreResults() } });
                 choiceEndOfGame.Choose();                
