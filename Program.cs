@@ -370,7 +370,20 @@ namespace KonzolovaHra
             void RenderBestThree()
             {
                 Console.Clear();
-                var bestthree = playerList.OrderByDescending(p => p.Value.PointList.Max()).Take(3).Select(p => p.Value);
+
+                //a subdictionary is created, into which only player with some results are copied:
+                Dictionary<int, Player> subPlayerList = new Dictionary<int, Player>();
+                foreach (KeyValuePair<int, Player> item in playerList)
+                {
+                    if (item.Value.PointList.Count > 0) subPlayerList.Add(item.Key, item.Value);
+                }
+                
+
+                //take 3 best, unless there are less than 3 players with results:
+                int numberOfBest = 3;
+                if (subPlayerList.Count < 3) numberOfBest = subPlayerList.Count;
+
+                var bestthree = subPlayerList.OrderByDescending(p => p.Value.PointList.Max()).Take(numberOfBest).Select(p => p.Value);
                 Console.WriteLine("První tři nejlepší: ");
                 int order = 1;
                 foreach(var item in bestthree)
@@ -378,6 +391,7 @@ namespace KonzolovaHra
                     Console.WriteLine($"{order}: {item.Name}, nejvyšší počet získaných bodů: {item.PointList.Max()}");
                     order++;
                 }
+                if (numberOfBest < 3) Console.WriteLine("(Ostatní ještě nehráli.)");
                 Console.WriteLine();
                 Console.WriteLine("A co dál?");
                 Console.WriteLine("Pokračovat v prozkoumávání výsledků - stikněte 1");
@@ -407,7 +421,8 @@ namespace KonzolovaHra
                             Console.WriteLine();
                             foreach(var item in chosenPlayer)
                             {
-                                Console.WriteLine($"Hráč \"{item.Name}\", nejvyšší počet získaných bodů: {item.PointList.Max()}");
+                                if (item.PointList.Count > 0) Console.WriteLine($"Hráč \"{item.Name}\", nejvyšší počet získaných bodů: {item.PointList.Max()}");
+                                else Console.WriteLine($"Hráč \"{item.Name}\", ještě nehrál(a)");
                             }                            
                         } 
                     }
@@ -432,7 +447,8 @@ namespace KonzolovaHra
                 int order = 1;
                 foreach (var item in sortedAlphabetically)
                 {
-                    Console.WriteLine($"{order}: {item.Name}, nejvyšší počet získaných bodů: {item.PointList.Max()}");
+                    if (item.PointList.Count > 0) Console.WriteLine($"{order}: {item.Name}, nejvyšší počet získaných bodů: {item.PointList.Max()}");
+                    else Console.WriteLine($"{order}: {item.Name}, ještě nehrál(a)");
                     order++;
                 }
 
@@ -449,7 +465,15 @@ namespace KonzolovaHra
             void RenderFromTheBest()
             {
                 Console.Clear();
-                var sortedByBest = playerList.OrderByDescending(p => p.Value.PointList.Max()).Select(p => p.Value);
+
+                //a subdictionary is created, into which only player with some results are copied:
+                Dictionary<int, Player> subPlayerList = new Dictionary<int, Player>();
+                foreach (KeyValuePair<int, Player> item in playerList)
+                {
+                    if (item.Value.PointList.Count > 0) subPlayerList.Add(item.Key, item.Value);
+                }
+
+                var sortedByBest = subPlayerList.OrderByDescending(p => p.Value.PointList.Max()).Select(p => p.Value);
                 Console.WriteLine("Seznam hráčů seřazených podle nejlepších výsledků: ");
                 Console.WriteLine();
                 int order = 1;
@@ -458,7 +482,7 @@ namespace KonzolovaHra
                     Console.WriteLine($"{order}: {item.Name}, nejvyšší počet získaných bodů: {item.PointList.Max()}");
                     order++;
                 }
-
+                if (subPlayerList.Count < playerList.Count) Console.WriteLine("(Ostatní ještě nehráli.)");
                 Console.WriteLine();
                 Console.WriteLine("A co dál?");
                 Console.WriteLine("Pokračovat v prozkoumávání výsledků - stikněte 1");
