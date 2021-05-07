@@ -47,6 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bullet.cs" />
+    <Compile Include="ChoiceMaking.cs" />
     <Compile Include="ConsoleObject.cs" />
     <Compile Include="Enemy.cs" />
     <Compile Include="EnemyBullet.cs" />
