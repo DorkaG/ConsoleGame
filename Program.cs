@@ -22,11 +22,11 @@ namespace KonzolovaHra
         //static List<Bullet> enemyBulletList = new List<Bullet>();
         static void Main(string[] args)
         {
-            Console.WindowWidth = 70;
+            Console.WindowWidth = 80;
             Console.WindowHeight = 20;
             int height = Console.WindowHeight;
             int width = Console.WindowWidth;            
-            Enemy enemy = new Enemy(width / 2, 1, "(@__@)", 0);
+            Enemy enemy = new Enemy(width / 2, 1, "(@__@)", 0); 
             //Player player = new Player(width / 2, height - 1, "☺", 0, 0, 1, "Hráč 1");
             
             Dictionary<int, Player> playerList = new Dictionary<int, Player>();
@@ -52,7 +52,7 @@ namespace KonzolovaHra
             {
                 if (!File.Exists("playerList.json"))
                 {
-                    //ZIVOTY POTE UPRAVIT
+                    //ZIVOTY POTE UPRAVIT ☺
                     playerList.Add(1, new Player(width / 2, height - 1, "☺", 0, 0, 1, "Adam", new List<int>(), 40));
                     playerList.Add(2, new Player(width / 2, height - 1, "☺", 0, 0, 1, "Bedřich", new List<int>(), 40));
                     playerList.Add(3, new Player(width / 2, height - 1, "☺", 0, 0, 1, "Cecílie", new List<int>(), 40));
@@ -242,13 +242,17 @@ namespace KonzolovaHra
                     Console.Write(" ");
 
                     Console.SetCursorPosition(enemy.X, enemy.Y);
+                    Console.ForegroundColor = ConsoleColor.Green;
                     Console.Write(enemy.Look);
+                    Console.ResetColor();
 
                     Console.SetCursorPosition(player.FormerX, player.Y);
                     Console.Write(" ");
-
+                   
                     Console.SetCursorPosition(player.X, player.Y);
+                    Console.ForegroundColor = ConsoleColor.Yellow;
                     Console.Write(player.Look);
+                    Console.ResetColor();
 
                     BulletRender(enemyBulletList);
                     BulletRender(playerBulletList);
@@ -326,17 +330,25 @@ namespace KonzolovaHra
             void EndOfGame(int score)
             {
                 string finalPhrase = "";
-                if (player.Life == 0 ) finalPhrase = "Zranění neslučitelné s životem, konec hry! Vaše skóre: " + score + " bodů";
-                else if (player.NumberOfBullets == 0) finalPhrase = "Došly náboje, konec hry! Vaše skóre: " + score + " bodů";
+                string points = "";
+
+                if (score == 1) points = "bod";
+                else if (score == 0 || score > 4) points = "bodů";
+                else if (score > 1 && score < 5) points = "body";
+
+                if (player.Life == 0 ) finalPhrase = "Zranění neslučitelné s životem, konec hry! Vaše skóre: " + score + " " + points;
+                else if (player.NumberOfBullets == 0) finalPhrase = "Došly náboje, konec hry! Vaše skóre: " + score + " " + points;
                 string question = "Co chcete udělat teď?";
                 string choice1 = "Dát si další hru: stiskněte 1";
                 string choice2 = "Ukončit hru: stiskněte 2";
                 string choice3 = "Zobrazit výsledky hráčů: stiskněte 3";
-                Console.SetCursorPosition((width - finalPhrase.Length) / 2, height / 2);
-                Console.WriteLine(finalPhrase); //30
-                                                                                //jen pro kontrolu:
-                                                                                //Console.WriteLine();
-                                                                                //PlayerListRender();
+
+                Console.ForegroundColor = ConsoleColor.Blue;
+                Console.BackgroundColor = ConsoleColor.Yellow;
+                Console.SetCursorPosition((width - finalPhrase.Length) / 2, height / 2);                
+                Console.WriteLine(finalPhrase);               
+                Console.ResetColor();
+
                 Console.SetCursorPosition((width - question.Length) / 2, (height / 2) + 2);
                 Console.WriteLine(question);
                 Console.SetCursorPosition((width - choice1.Length) / 2, (height / 2) + 4);
