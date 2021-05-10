@@ -163,6 +163,7 @@ namespace KonzolovaHra
                 Console.WriteLine("Zde je seznam hráčů:");
                 PlayerListRender();
                 Console.WriteLine();
+                Console.WriteLine();
                 Console.WriteLine("Zadejte číslo hráče, se kterým chcete hrát:");
 
                 /* var actions = playerList.ToDictionary(x => x.Key, x =>
@@ -204,7 +205,15 @@ namespace KonzolovaHra
                     string highestScore = "";
                     if (item.Value.PointList.Count == 0) highestScore = "Ještě nehrál(a).";
                     else highestScore = item.Value.PointList.Max().ToString();
-                    Console.WriteLine(item.Key + " " + item.Value.Name + " nejvyšší dosažené skóre: " + highestScore);
+                    Console.WriteLine();
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.Write(item.Value.Name);
+                    Console.ResetColor();
+                    Console.Write(" - číslo hráče: ");
+                    Console.ForegroundColor = ConsoleColor.Cyan;
+                    Console.Write(item.Key);
+                    Console.ResetColor();
+                    Console.Write(", nejvyšší dosažené skóre: " + highestScore);
                 }
             }
 
