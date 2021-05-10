@@ -15,35 +15,25 @@ namespace KonzolovaHra
         static Timer consoleTimer = null;
         static Timer enemyShooting = null;
         static Timer enemyMove = null;
+        static Timer consoleClearTimer = null;
         static Player player = null;
         static List<Bullet> playerBulletList = null;
         static List<Bullet> enemyBulletList = null;
-        //static List<Bullet> playerBulletList = new List<Bullet>();
-        //static List<Bullet> enemyBulletList = new List<Bullet>();
+        
         static void Main(string[] args)
         {
             Console.WindowWidth = 80;
             Console.WindowHeight = 20;
             int height = Console.WindowHeight;
             int width = Console.WindowWidth;            
-            Enemy enemy = new Enemy(width / 2, 1, "(@__@)", 0); 
-            //Player player = new Player(width / 2, height - 1, "☺", 0, 0, 1, "Hráč 1");
+            Enemy enemy = new Enemy(width / 2, 1, "(@__@)", 0);             
             
-            Dictionary<int, Player> playerList = new Dictionary<int, Player>();
-            //string fileName = "";
-            //string pathToFile = "";
-            //string pathToDatabase = "";
-
-            //string fileName = "playerList.json";
+            Dictionary<int, Player> playerList = new Dictionary<int, Player>();            
 
             JsonSerializerSettings settings = new JsonSerializerSettings();
             settings.TypeNameHandling = TypeNameHandling.All;
             settings.Formatting = Newtonsoft.Json.Formatting.Indented;
-            //string PlayerListJson;
-            //string pathToFile = @"C:\ProgramData"; //do bin radeji
-            //string pathToDatabase = Path.Combine(pathToFile, fileName);
-
-            //if (!Directory.Exists(Path.Combine(@"C:\ProgramData", "playerList.txt")))
+            
             loadPlayerFromFile();
             Play();
 
@@ -74,32 +64,28 @@ namespace KonzolovaHra
             }
             
             void Play()
-            {
-                //Player player = playerList[1];
-                //Player player = new Player(width / 2, height - 1, "☺", 0, 0, 1, "pokus", new List<int>());
-
-                //List<Bullet> playerBulletList = new List<Bullet>();
-                playerBulletList = new List<Bullet>();
-                //List<Bullet> enemyBulletList = new List<Bullet>();
+            {                
+                playerBulletList = new List<Bullet>();               
                 enemyBulletList = new List<Bullet>();
 
                 TimeSpan threadSleepTimeSpan = TimeSpan.FromMilliseconds(301);
 
                 Console.CursorVisible = false;
-                Console.Clear();
+                Console.Clear();                
 
-                var autoEvent = new AutoResetEvent(false); //???
+                var autoEvent = new AutoResetEvent(false);
 
                 Console.WriteLine("Vítejte ve hře. \n Nejdříve si vyberte, s jakým hráčem budete hrát. \n Hráče si můžete buď nově vytvořit, nebo si ho vybrat z existujícího seznamu. \n \n \"Chci si vytvořit nového hráče\" - stiskněte 1 \n \"Chci si vybrat již existujícího hráče\" - stiskněte 2");
                 ChoosePlayer();
-
+                
                 consoleTimer = new Timer(ConsoleRender, autoEvent, 1000, 300);
-                var consoleClearTimer = new Timer(ClearConsole, autoEvent, 1000, 2000);
+                consoleClearTimer = new Timer(ClearConsole, autoEvent, 1000, 2000);
                 enemyShooting = new Timer(EnemyIsShooting, autoEvent, 5000, 8000);
                 enemyMove = new Timer(enemy.MoveEnemy, autoEvent, 1000, 1000);
 
                 while (true)
-                {
+                {                    
+
                     if (Console.KeyAvailable)   //neceka, az neco zmacknu
                     {
                         switch (Console.ReadKey(true).Key)
@@ -126,8 +112,6 @@ namespace KonzolovaHra
                     Thread.Sleep(threadSleepTimeSpan);   //uspani while, aby byl pohyb plynuly
                 }
             }
-
-
 
             void ChoosePlayer()
             {
@@ -226,6 +210,7 @@ namespace KonzolovaHra
                     consoleTimer.Change(Timeout.Infinite, Timeout.Infinite);
                     enemyShooting.Change(Timeout.Infinite, Timeout.Infinite);
                     enemyMove.Change(Timeout.Infinite, Timeout.Infinite);
+                    consoleClearTimer.Change(Timeout.Infinite, Timeout.Infinite);
                     int actualScore = player.Points;
                     SaveTheResults();
                     EndOfGame(actualScore);                                        
@@ -337,7 +322,7 @@ namespace KonzolovaHra
                 else if (score > 1 && score < 5) points = "body";
 
                 if (player.Life == 0 ) finalPhrase = "Zranění neslučitelné s životem, konec hry! Vaše skóre: " + score + " " + points;
-                else if (player.NumberOfBullets == 0) finalPhrase = "Došly náboje, konec hry! Vaše skóre: " + score + " " + points;
+                else if (player.NumberOfBullets == 0) finalPhrase = "Došly náb oje, konec hry! Vaše skóre: " + score + " " + points;
                 string question = "Co chcete udělat teď?";
                 string choice1 = "Dát si další hru: stiskněte 1";
                 string choice2 = "Ukončit hru: stiskněte 2";
@@ -359,7 +344,9 @@ namespace KonzolovaHra
                 Console.WriteLine(choice3);
                 Console.SetCursorPosition(width - 12, height);
                 Console.Write("Životy: " + player.Life);
-                Console.SetCursorPosition(width / 2, (height / 2) + 7);              
+                Console.SetCursorPosition(width / 2, (height / 2) + 7);
+                Console.WriteLine(" ");
+                Console.SetCursorPosition(width / 2, (height / 2) + 7);
 
                 ChoiceMaking choiceEndOfGame = new ChoiceMaking(new Dictionary<int, Action>() { {1, () => { loadPlayerFromFile(); Play(); } }, {2, () => Environment.Exit(0)}, {3, () => ExploreResults() } });
                 choiceEndOfGame.Choose();                
