@@ -18,7 +18,7 @@ namespace KonzolovaHra
         static Timer consoleClearTimer = null;
         static Player player = null;
         static List<Bullet> playerBulletList = null;
-        static List<Bullet> enemyBulletList = null;
+        static List<Bullet> enemyBulletList = null;        
         
         static void Main(string[] args)
         {
@@ -35,6 +35,7 @@ namespace KonzolovaHra
             settings.Formatting = Newtonsoft.Json.Formatting.Indented;
             
             loadPlayerFromFile();
+            Initialisation();
             Play();
 
 
@@ -56,6 +57,7 @@ namespace KonzolovaHra
                     {
                         item.Value.X = width / 2;
                         item.Value.Y = height - 1;
+                        item.Value.FormerX = 0;
                         item.Value.Points = 0;
                         item.Value.Life = 1;     ///TOHLE POTOM UPRAVT
                         item.Value.NumberOfBullets = 40;
@@ -63,12 +65,10 @@ namespace KonzolovaHra
                 }
             }
             
-            void Play()
+            void Initialisation()
             {                
                 playerBulletList = new List<Bullet>();               
-                enemyBulletList = new List<Bullet>();
-
-                TimeSpan threadSleepTimeSpan = TimeSpan.FromMilliseconds(301);
+                enemyBulletList = new List<Bullet>();                
 
                 Console.CursorVisible = false;
                 Console.Clear();                
@@ -81,10 +81,15 @@ namespace KonzolovaHra
                 consoleTimer = new Timer(ConsoleRender, autoEvent, 1000, 300);
                 consoleClearTimer = new Timer(ClearConsole, autoEvent, 1000, 2000);
                 enemyShooting = new Timer(EnemyIsShooting, autoEvent, 5000, 8000);
-                enemyMove = new Timer(enemy.MoveEnemy, autoEvent, 1000, 1000);
+                enemyMove = new Timer(enemy.MoveEnemy, autoEvent, 1000, 1000);                                               
+            }
+
+            void Play()
+            {
+                TimeSpan threadSleepTimeSpan = TimeSpan.FromMilliseconds(301);
 
                 while (true)
-                {                    
+                {
 
                     if (Console.KeyAvailable)   //neceka, az neco zmacknu
                     {
@@ -211,7 +216,7 @@ namespace KonzolovaHra
                     enemyShooting.Change(Timeout.Infinite, Timeout.Infinite);
                     enemyMove.Change(Timeout.Infinite, Timeout.Infinite);
                     consoleClearTimer.Change(Timeout.Infinite, Timeout.Infinite);
-                    int actualScore = player.Points;
+                    int actualScore = player.Points;                   
                     SaveTheResults();
                     EndOfGame(actualScore);                                        
                 }
@@ -313,7 +318,7 @@ namespace KonzolovaHra
             }
 
             void EndOfGame(int score)
-            {
+            {              
                 string finalPhrase = "";
                 string points = "";
 
@@ -322,7 +327,7 @@ namespace KonzolovaHra
                 else if (score > 1 && score < 5) points = "body";
 
                 if (player.Life == 0 ) finalPhrase = "Zranění neslučitelné s životem, konec hry! Vaše skóre: " + score + " " + points;
-                else if (player.NumberOfBullets == 0) finalPhrase = "Došly náb oje, konec hry! Vaše skóre: " + score + " " + points;
+                else if (player.NumberOfBullets == 0) finalPhrase = "Došly náboje, konec hry! Vaše skóre: " + score + " " + points;
                 string question = "Co chcete udělat teď?";
                 string choice1 = "Dát si další hru: stiskněte 1";
                 string choice2 = "Ukončit hru: stiskněte 2";
@@ -348,7 +353,7 @@ namespace KonzolovaHra
                 Console.WriteLine(" ");
                 Console.SetCursorPosition(width / 2, (height / 2) + 7);
 
-                ChoiceMaking choiceEndOfGame = new ChoiceMaking(new Dictionary<int, Action>() { {1, () => { loadPlayerFromFile(); Play(); } }, {2, () => Environment.Exit(0)}, {3, () => ExploreResults() } });
+                ChoiceMaking choiceEndOfGame = new ChoiceMaking(new Dictionary<int, Action>() { {1, () => { loadPlayerFromFile(); Initialisation(); } }, {2, () => Environment.Exit(0)}, {3, () => ExploreResults() } });
                 choiceEndOfGame.Choose();                
             }                                    
 
@@ -397,7 +402,7 @@ namespace KonzolovaHra
                 Console.WriteLine("Ukončit hru - stiskněte 2");
                 Console.WriteLine("Začít novou hru - stiskněte 3");
 
-                ChoiceMaking choiceAfterExploring = new ChoiceMaking(new Dictionary<int, Action>() { {1, () => ExploreResults() }, { 2, () => Environment.Exit(0) }, {3, () => { loadPlayerFromFile(); Play(); } } });
+                ChoiceMaking choiceAfterExploring = new ChoiceMaking(new Dictionary<int, Action>() { {1, () => ExploreResults() }, { 2, () => Environment.Exit(0) }, {3, () => { loadPlayerFromFile(); Initialisation(); } } });
                 choiceAfterExploring.Choose();               
             }
 
@@ -433,7 +438,7 @@ namespace KonzolovaHra
                 Console.WriteLine("Ukončit hru - stiskněte 2");
                 Console.WriteLine("Začít novou hru - stiskněte 3");
 
-                ChoiceMaking choiceAfterExploring = new ChoiceMaking(new Dictionary<int, Action>() { { 1, () => ExploreResults() }, { 2, () => Environment.Exit(0) }, { 3, () => { loadPlayerFromFile(); Play(); } } });
+                ChoiceMaking choiceAfterExploring = new ChoiceMaking(new Dictionary<int, Action>() { { 1, () => ExploreResults() }, { 2, () => Environment.Exit(0) }, { 3, () => { loadPlayerFromFile(); Initialisation(); } } });
                 choiceAfterExploring.Choose();                
             }
 
@@ -457,7 +462,7 @@ namespace KonzolovaHra
                 Console.WriteLine("Ukončit hru - stiskněte 2");
                 Console.WriteLine("Začít novou hru - stiskněte 3");
 
-                ChoiceMaking choiceAfterExploring = new ChoiceMaking(new Dictionary<int, Action>() { { 1, () => ExploreResults() }, { 2, () => Environment.Exit(0) }, { 3, () => { loadPlayerFromFile(); Play(); } } });
+                ChoiceMaking choiceAfterExploring = new ChoiceMaking(new Dictionary<int, Action>() { { 1, () => ExploreResults() }, { 2, () => Environment.Exit(0) }, { 3, () => { loadPlayerFromFile(); Initialisation(); } } });
                 choiceAfterExploring.Choose();                
             }
 
@@ -488,7 +493,7 @@ namespace KonzolovaHra
                 Console.WriteLine("Ukončit hru - stiskněte 2");
                 Console.WriteLine("Začít novou hru - stiskněte 3");
 
-                ChoiceMaking choiceAfterExploring = new ChoiceMaking(new Dictionary<int, Action>() { { 1, () => ExploreResults() }, { 2, () => Environment.Exit(0) }, { 3, () => { loadPlayerFromFile(); Play(); } } });
+                ChoiceMaking choiceAfterExploring = new ChoiceMaking(new Dictionary<int, Action>() { { 1, () => ExploreResults() }, { 2, () => Environment.Exit(0) }, { 3, () => { loadPlayerFromFile(); Initialisation(); } } });
                 choiceAfterExploring.Choose();               
             }
 
