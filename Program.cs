@@ -44,9 +44,9 @@ namespace KonzolovaHra
                 if (!File.Exists("playerList.json"))
                 {
                     //ZIVOTY POTE UPRAVIT ☺
-                    playerList.Add(1, new Player(width / 2, height - 1, "☺", 0, 0, 1, "Adam", new List<int>(), 40));
-                    playerList.Add(2, new Player(width / 2, height - 1, "☺", 0, 0, 1, "Bedřich", new List<int>(), 40));
-                    playerList.Add(3, new Player(width / 2, height - 1, "☺", 0, 0, 1, "Cecílie", new List<int>(), 40));
+                    playerList.Add(1, new Player(width / 2, height - 1, "(°.°)", 0, 0, 2, "Adam", new List<int>(), 40));
+                    playerList.Add(2, new Player(width / 2, height - 1, "(°.°)", 0, 0, 2, "Bedřich", new List<int>(), 40));
+                    playerList.Add(3, new Player(width / 2, height - 1, "(°.°)", 0, 0, 2, "Cecílie", new List<int>(), 40));
 
                 }
                 else
@@ -59,7 +59,7 @@ namespace KonzolovaHra
                         item.Value.Y = height - 1;
                         item.Value.FormerX = 0;
                         item.Value.Points = 0;
-                        item.Value.Life = 1;     ///TOHLE POTOM UPRAVT
+                        item.Value.Life = 2;     ///TOHLE POTOM UPRAVT
                         item.Value.NumberOfBullets = 40;
                     }
                 }
@@ -103,7 +103,7 @@ namespace KonzolovaHra
                                 break;
                             case ConsoleKey.UpArrow:
                             case ConsoleKey.Spacebar:
-                                playerBulletList.Add(new PlayerBullet(player.X, player.Y - 1, "|", 0, true));
+                                playerBulletList.Add(new PlayerBullet(player.X + 2, player.Y - 1, "|", 0, true));
                                 player.NumberOfBullets--;
                                 break;
                         }
@@ -149,7 +149,7 @@ namespace KonzolovaHra
                         if (!nameAlreadyExists)
                         {
                             nameEntered = true;
-                            playerList.Add(playerList.Count + 1, new Player(width / 2, height - 1, "☺", 0, 0, 1, name, new List<int>(), 40));
+                            playerList.Add(playerList.Count + 1, new Player(width / 2, height - 1, "(°.°)", 0, 0, 2, name, new List<int>(), 40));
                             player = playerList[playerList.Count];
                             Console.WriteLine("Výborně, budete hrát jako \"" + player.Name + "\". Zmáčkněte Enter a hra může začít.");
                             Console.ReadLine();
@@ -238,7 +238,7 @@ namespace KonzolovaHra
                     Console.Write("Životy: " + player.Life);
 
                     Console.SetCursorPosition(enemy.FormerX, enemy.Y);
-                    Console.Write(" ");
+                    Console.Write("      ");
 
                     Console.SetCursorPosition(enemy.X, enemy.Y);
                     Console.ForegroundColor = ConsoleColor.Green;
@@ -246,7 +246,7 @@ namespace KonzolovaHra
                     Console.ResetColor();
 
                     Console.SetCursorPosition(player.FormerX, player.Y);
-                    Console.Write(" ");
+                    Console.Write("     ");
                    
                     Console.SetCursorPosition(player.X, player.Y);
                     Console.ForegroundColor = ConsoleColor.Yellow;
@@ -268,7 +268,7 @@ namespace KonzolovaHra
 
             void EnemyIsShooting(Object stateInfo)
             {
-                enemyBulletList.Add(new EnemyBullet(enemy.X, 1, "O", 0, true));
+                enemyBulletList.Add(new EnemyBullet(enemy.X+3, 1, "O", 0, true));
             }            
 
             void BulletRender(List<Bullet> list)
@@ -307,10 +307,11 @@ namespace KonzolovaHra
             {
                 foreach (EnemyBullet bullet in enemyBulletList)
                 {
-                    if (bullet.X == player.X && bullet.Y == player.Y)
+                    if (bullet.X >= player.X && bullet.X <= player.X + 4 && bullet.Y == player.Y)
                     {
-                        Console.SetCursorPosition(bullet.X, bullet.Y);
-                        Console.Write("####");
+                        //Console.SetCursorPosition(bullet.X, bullet.Y);
+                        Console.SetCursorPosition(player.X-2, player.Y);
+                        Console.Write("\\(°o°)/");
 
                         player.Life--;
                     }
@@ -327,7 +328,7 @@ namespace KonzolovaHra
             }
 
             void EndOfGame(int score)
-            {              
+            {
                 string finalPhrase = "";
                 string points = "";
 
@@ -335,7 +336,7 @@ namespace KonzolovaHra
                 else if (score == 0 || score > 4) points = "bodů";
                 else if (score > 1 && score < 5) points = "body";
 
-                if (player.Life == 0 ) finalPhrase = "Zranění neslučitelné s životem, konec hry! Vaše skóre: " + score + " " + points;
+                if (player.Life == 0) finalPhrase = "Zranění neslučitelné s životem, konec hry! Vaše skóre: " + score + " " + points;
                 else if (player.NumberOfBullets == 0) finalPhrase = "Došly náboje, konec hry! Vaše skóre: " + score + " " + points;
                 string question = "Co chcete udělat teď?";
                 string choice1 = "Dát si další hru: stiskněte 1";
@@ -344,8 +345,8 @@ namespace KonzolovaHra
 
                 Console.ForegroundColor = ConsoleColor.Blue;
                 Console.BackgroundColor = ConsoleColor.Yellow;
-                Console.SetCursorPosition((width - finalPhrase.Length) / 2, height / 2);                
-                Console.WriteLine(finalPhrase);               
+                Console.SetCursorPosition((width - finalPhrase.Length) / 2, height / 2);
+                Console.WriteLine(finalPhrase);
                 Console.ResetColor();
 
                 Console.SetCursorPosition((width - question.Length) / 2, (height / 2) + 2);
@@ -357,7 +358,19 @@ namespace KonzolovaHra
                 Console.SetCursorPosition((width - choice3.Length) / 2, (height / 2) + 6);
                 Console.WriteLine(choice3);
                 Console.SetCursorPosition(width - 12, height);
-                Console.Write("Životy: " + player.Life);
+                Console.Write("Životy: " + player.Life);                
+
+                if (player.Life == 0)
+                {
+                    Console.SetCursorPosition(player.X - 2, player.Y);
+                    Console.Write("  (x.x)  ");
+                }
+                else if (player.NumberOfBullets == 0)
+                {
+                    Console.SetCursorPosition(player.X - 2, player.Y);
+                    Console.Write("  (°.°)  ");
+                }
+
                 Console.SetCursorPosition(width / 2, (height / 2) + 7);
                 Console.WriteLine(" ");
                 Console.SetCursorPosition(width / 2, (height / 2) + 7);
