@@ -28,15 +28,15 @@ namespace KonzolovaHra
             if (number == 1)
             {
                 if (X < Console.WindowWidth-6) X++;
-                else if (X == Console.WindowWidth-6) X = Console.WindowWidth - 5;
+                else if (X == Console.WindowWidth-6) X = Console.WindowWidth - 7;
 
                 if (positionCounter < 10) positionCounter++;
                 else positionCounter = 0;
             }
             if (number == 2)
             {
-                if (X > 0) X--;
-                else if (X == 0) X = 1;
+                if (X >= 1) X--;
+                else if (X < 1) X = 1;
                 if (positionCounter < 10) positionCounter++;
                 else positionCounter = 0;
             }

@@ -24,8 +24,8 @@ namespace KonzolovaHra
         public void MovePlayer(int number)
         {
             FormerX = X;
-            if (X <= Console.WindowWidth && X >= 1) X += number;
-            else if (X > Console.WindowWidth) X = Console.WindowWidth;
+            if (X < Console.WindowWidth - 5 && X >= 1) X += number;
+            else if (X >= Console.WindowWidth - 5) X = Console.WindowWidth - 6;
             else if (X < 1) X = 1;
         }
     }
