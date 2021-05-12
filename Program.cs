@@ -42,8 +42,7 @@ namespace KonzolovaHra
             void loadPlayerFromFile()
             {
                 if (!File.Exists("playerList.json"))
-                {
-                    //ZIVOTY POTE UPRAVIT ☺
+                {                    
                     playerList.Add(1, new Player(width / 2, height - 1, "(°.°)", 0, 0, 2, "Adam", new List<int>(), 40));
                     playerList.Add(2, new Player(width / 2, height - 1, "(°.°)", 0, 0, 2, "Bedřich", new List<int>(), 40));
                     playerList.Add(3, new Player(width / 2, height - 1, "(°.°)", 0, 0, 2, "Cecílie", new List<int>(), 40));
@@ -59,7 +58,7 @@ namespace KonzolovaHra
                         item.Value.Y = height - 1;
                         item.Value.FormerX = 0;
                         item.Value.Points = 0;
-                        item.Value.Life = 2;     ///TOHLE POTOM UPRAVT
+                        item.Value.Life = 2;     
                         item.Value.NumberOfBullets = 40;
                     }
                 }
@@ -151,7 +150,19 @@ namespace KonzolovaHra
                             nameEntered = true;
                             playerList.Add(playerList.Count + 1, new Player(width / 2, height - 1, "(°.°)", 0, 0, 2, name, new List<int>(), 40));
                             player = playerList[playerList.Count];
-                            Console.WriteLine("Výborně, budete hrát jako \"" + player.Name + "\". Zmáčkněte Enter a hra může začít.");
+                            Console.Write("Výborně, budete hrát jako ");
+                            Console.ForegroundColor = ConsoleColor.Cyan;
+                            Console.Write(player.Name);
+                            Console.ResetColor();
+                            Console.Write(".");
+                            Console.WriteLine();
+                            Console.WriteLine();
+                            Console.WriteLine("Pohybujte s hráčem pomocí šipek doprava nebo doleva. \n Střílejte pomocí šipky nahoru nebo mezerníku. \n Vyhýbejte se nepřátelským střelám!");
+                            Console.WriteLine();
+                            Console.ForegroundColor = ConsoleColor.Blue;
+                            Console.BackgroundColor = ConsoleColor.Yellow;
+                            Console.WriteLine("Zmáčkněte Enter a hra může začít.");
+                            Console.ResetColor();
                             Console.ReadLine();
                         }                        
                     }
@@ -164,17 +175,7 @@ namespace KonzolovaHra
                 PlayerListRender();
                 Console.WriteLine();
                 Console.WriteLine();
-                Console.WriteLine("Zadejte číslo hráče, se kterým chcete hrát:");
-
-                /* var actions = playerList.ToDictionary(x => x.Key, x =>
-                    () => {
-                        player = playerList[x.Key];
-                        Console.WriteLine("Výborně, budete hrát jako \"" + player.Name + "\". Zmáčkněte Enter a hra může začít.");
-                        Console.ReadLine();
-                    }
-                );*/
-
-                //TOHLE JESTE TAKZ PREDELAT NA TRIDU???
+                Console.WriteLine("Zadejte číslo hráče, se kterým chcete hrát:");               
 
                 bool choiceDone = false;
                 do
@@ -191,7 +192,19 @@ namespace KonzolovaHra
                     {
                         choiceDone = true;
                         player = playerList[number];
-                        Console.WriteLine("Výborně, budete hrát jako \"" + player.Name + "\". Zmáčkněte Enter a hra může začít.");
+                        Console.Write("Výborně, budete hrát jako ");
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.Write(player.Name);
+                        Console.ResetColor();
+                        Console.Write(".");
+                        Console.WriteLine();
+                        Console.WriteLine();
+                        Console.WriteLine("Pohybujte s hráčem pomocí šipek doprava nebo doleva. \n Střílejte pomocí šipky nahoru nebo mezerníku. \n Vyhýbejte se nepřátelským střelám!");
+                        Console.WriteLine();
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                        Console.BackgroundColor = ConsoleColor.Yellow;
+                        Console.WriteLine("Zmáčkněte Enter a hra může začít.");
+                        Console.ResetColor();
                         Console.ReadLine();
                     }
                 } while (!choiceDone);
@@ -308,8 +321,7 @@ namespace KonzolovaHra
                 foreach (EnemyBullet bullet in enemyBulletList)
                 {
                     if (bullet.X >= player.X && bullet.X <= player.X + 4 && bullet.Y == player.Y)
-                    {
-                        //Console.SetCursorPosition(bullet.X, bullet.Y);
+                    {                        
                         Console.SetCursorPosition(player.X-2, player.Y);
                         Console.Write("\\(°o°)/");
 
