@@ -73,8 +73,20 @@ namespace KonzolovaHra
                 Console.Clear();                
 
                 var autoEvent = new AutoResetEvent(false);
-
-                Console.WriteLine("Vítejte ve hře. \n Nejdříve si vyberte, s jakým hráčem budete hrát. \n Hráče si můžete buď nově vytvořit, nebo si ho vybrat z existujícího seznamu. \n \n \"Chci si vytvořit nového hráče\" - stiskněte 1 \n \"Chci si vybrat již existujícího hráče\" - stiskněte 2");
+                Console.SetCursorPosition((width / 2) - 15, 4);
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("(°.°);= -- --  - - - -\\(@__@)/");
+                Console.ResetColor();
+                Console.WriteLine();
+                Console.SetCursorPosition((width/2)-11, 6);
+                Console.BackgroundColor = ConsoleColor.Cyan;
+                Console.ForegroundColor = ConsoleColor.Blue;
+                Console.WriteLine("Vítejte ve hře PUIPUI!");
+                Console.ResetColor();
+                Console.WriteLine();
+                Console.WriteLine();
+                Console.WriteLine();
+                Console.WriteLine("Nejdříve si vyberte, s jakým hráčem budete hrát. \n Hráče si můžete buď nově vytvořit, nebo si ho vybrat z existujícího seznamu. \n \n \"Chci si vytvořit nového hráče\" - stiskněte 1 \n \"Chci si vybrat již existujícího hráče\" - stiskněte 2");
                 ChoosePlayer();
                 
                 consoleTimer = new Timer(ConsoleRender, autoEvent, 1000, 300);
